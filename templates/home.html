@@ -1,0 +1,38 @@
+<!-- similarity_docs_app/templates/home.html -->
+{% extends 'base.html' %} {% block content %}
+<div id="content-saved">
+  <div id="content-saved-heading">
+    Analisa Tingkat Keterkaitan Antara Naskah Peraturan
+  </div>
+  <div id="content-saved-subheading">Dokumen yang Tersimpan</div>
+  {% if documents %}
+  <div id="content-saved-list">
+    {% for doc in documents %}
+    <div id="content-saved-item-{{ doc.id }}" class="content-saved-item">
+      <div class="content-saved-title">
+        <div>{{ forloop.counter }}.</div>
+        <div>{{ doc.title }}</div>
+      </div>
+      <div class="content-saved-actions">
+        <a href="{% url 'view_document' doc.id %}" class="content-saved-show"
+          >Lihat Isi</a
+        >
+        <div>|</div>
+        <form
+          id="delete-form-{{ doc.id }}"
+          method="POST"
+          action="{% url 'delete_document' doc_id=doc.id %}"
+        >
+          {% csrf_token %}
+          <button class="content-saved-delete" type="submit" name="delete">
+            Hapus
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

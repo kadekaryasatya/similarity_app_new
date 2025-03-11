@@ -1,0 +1,23 @@
+#content-detail-similarity {
+  padding: 40px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#content-detail-similarity-subheading {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: white;
+  margin-bottom: 20px;
+}
+
+#content-detail-similarity-list {
+  background-color: white;
+  padding: 10px 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 60vh;
+  border-radius: 8px;
+}

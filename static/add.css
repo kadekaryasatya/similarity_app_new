@@ -1,0 +1,88 @@
+#content-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  height: 100%;
+}
+
+#content-add-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: white;
+}
+
+#content-add-file-input {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 24px;
+}
+
+#content-add-file {
+  display: none;
+}
+
+#content-add-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  background-color: #007b8f;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 2px solid white;
+  overflow: hidden; /* Sembunyikan teks yang panjang */
+  white-space: nowrap; /* Jangan pecah baris */
+  text-overflow: ellipsis; /* Tambahkan "..." untuk teks panjang */
+  padding: 0 10px; /* Spasi pada sisi dalam */
+  box-sizing: border-box;
+}
+
+#file-button-text {
+  max-width: 85%; /* Batasi lebar nama file */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#content-add-file-button span {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+#content-add-file-button:hover {
+  background-color: #005f6b;
+}
+
+#content-add-file-name {
+  margin-top: 12px;
+  font-size: 14px;
+  color: white;
+}
+
+#content-add-upload-button {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  font-size: 16px;
+  color: white;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#content-add-upload-button:hover {
+  background-color: #388e3c;
+}

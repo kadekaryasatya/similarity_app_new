@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block content %}
+<div id="content-similarity">
+  <div id="content-similarity-subheading">Keterkaitan Dokumen</div>
+
+  {% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+  {% else %} {% if similarity_results %}
+  <div id="content-similarity-list">
+    <h2>Hasil Keterkaitan Dokumen</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Dokumen 1</th>
+          <th>Dokumen 2</th>
+          <th>Nilai Keterkaitan (%)</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in similarity_results %}
+        <tr>
+          <td>{{ result.dokumen1 }}</td>
+          <td>{{ result.dokumen2 }}</td>
+          <td>{{ result.keterkaitan }}</td>
+          <td>
+            <a href="{{ result.detail_url }}" class="btn btn-link"
+              >Lihat Detail</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %} {% if clustering_ready %}
+  <a href="{% url 'clustering' %}" class="btn btn-success">Lihat Clustering</a>
+  {% endif %} {% endif %}
+</div>
+{% endblock %}

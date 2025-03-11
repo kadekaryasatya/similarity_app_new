@@ -1,0 +1,221 @@
+{% extends 'base.html' %} {% block content %}
+<div id="content-detail">
+  <div id="content-detail-heading">
+    <div id="content-detail-subheading">Detail Dokumen</div>
+    <form
+      id="delete-form-{{ doc.id }}"
+      method="POST"
+      action="{% url 'delete_document' doc_id=doc.id %}"
+      onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');"
+    >
+      {% csrf_token %}
+      <button class="content-saved-delete" type="submit">Hapus</button>
+    </form>
+  </div>
+
+  <div id="content-detail-list">
+    <h2>{{ doc.title }}</h2>
+    <p><strong>Penandatangan:</strong> {{ doc.penandatangan }}</p>
+    <p>
+      <strong>Tanggal Ditandatangani:</strong> {{ doc.tanggal_ditandatangani }}
+    </p>
+    <p><strong>Lembaga Mengeluarkan:</strong> {{ doc.lembaga_mengeluarkan }}</p>
+    <p><strong>No. Dokumen:</strong> {{ doc.no_dokumen }}</p>
+    <p><strong>Status Dokumen:</strong> {{ doc.status_dokumen }}</p>
+    <p><strong>Lokasi Penerbit:</strong> {{ doc.lokasi_penerbit }}</p>
+    <p><strong>Sumber:</strong> {{ doc.sumber }}</p>
+    <p><strong>Ringkasan:</strong> {{ doc.ringkasan }}</p>
+
+    <hr />
+
+    <div id="content-components">
+      <h3>Komponen Dokumen</h3>
+      {% if komponen_list %}
+      <ul>
+        {% for item in komponen_list %}
+        <li>
+          <strong>{{ item.komponen.nama_komponen }}</strong>:
+          <p>{{ item.isi_komponen }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>Tidak ada komponen terkait.</p>
+      {% endif %}
+    </div>
+
+    <hr />
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <h3>Grafik Similarity</h3>
+
+      <div>
+        <label for="thresholdInput">Batas Keterkaitan (%) :</label>
+        <input
+          type="number"
+          id="thresholdInput"
+          value="50"
+          min="0"
+          max="100"
+          step="1"
+          style="
+            padding: 5px;
+            border-radius: 8px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+          "
+        />
+        <button
+          onclick="loadGraph()"
+          style="
+            padding: 5px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Tampilkan
+        </button>
+      </div>
+    </div>
+    <div
+      id="network-graph"
+      style="
+        width: 100%;
+        height: 65vh;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+      "
+    ></div>
+  </div>
+</div>
+
+<!-- Vis.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    loadGraph();
+  });
+
+  function loadGraph() {
+    const docId = "{{ doc.id }}";
+    const threshold =
+      parseFloat(document.getElementById("thresholdInput").value) || 10;
+
+    fetch(`/similarity_graph_detail/${docId}/`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.nodes.length) {
+          document.getElementById("network-graph").innerHTML =
+            "<p class='text-center text-danger'>Tidak ada keterkaitan dokumen yang ditemukan.</p>";
+          return;
+        }
+
+        function truncateLabel(label, maxLength = 15) {
+          return label.length > maxLength
+            ? label.substring(0, maxLength) + "..."
+            : label;
+        }
+
+        function scaleWidth(similarity_score) {
+          const minWidth = 1;
+          const maxWidth = 15;
+          return minWidth + (maxWidth - minWidth) * (similarity_score / 100);
+        }
+
+        function getEdgeColor(similarity_score) {
+          if (similarity_score >= 80) return "#e74c3c";
+          if (similarity_score >= 50) return "#f39c12";
+          return "#3498db";
+        }
+
+        let filteredEdges = data.edges.filter(
+          (edge) => parseFloat(edge.label.replace("%", "")) >= threshold
+        );
+
+        let connectedNodeIds = new Set();
+        filteredEdges.forEach((edge) => {
+          connectedNodeIds.add(edge.from);
+          connectedNodeIds.add(edge.to);
+        });
+
+        let filteredNodes = data.nodes.filter((node) =>
+          connectedNodeIds.has(node.id)
+        );
+
+        const nodeDegree = {};
+        filteredEdges.forEach((edge) => {
+          nodeDegree[edge.from] = (nodeDegree[edge.from] || 0) + 1;
+          nodeDegree[edge.to] = (nodeDegree[edge.to] || 0) + 1;
+        });
+
+        let nodes = new vis.DataSet(
+          filteredNodes.map((node) => ({
+            id: node.id,
+            label: truncateLabel(node.label),
+            title: node.label,
+            shape: "dot",
+            size: 20 + (nodeDegree[node.id] || 0) * 3,
+            color: "#2ecc71",
+            font: { size: 14, color: "#000000", face: "Arial" },
+          }))
+        );
+
+        let edges = new vis.DataSet(
+          filteredEdges.map((edge) => {
+            const similarity_score = parseFloat(edge.label.replace("%", ""));
+            return {
+              from: edge.from,
+              to: edge.to,
+              width: scaleWidth(similarity_score),
+              label: edge.label,
+              font: { align: "middle", color: "#000000", size: 12 },
+              color: { color: getEdgeColor(similarity_score), opacity: 0.9 },
+            };
+          })
+        );
+
+        let container = document.getElementById("network-graph");
+        let networkData = { nodes: nodes, edges: edges };
+        let options = {
+          edges: { smooth: true, arrows: { to: { enabled: false } } },
+          nodes: { borderWidth: 2, shadow: true },
+          interaction: { hover: true, navigationButtons: true, zoomView: true },
+          physics: {
+            enabled: true,
+            solver: "forceAtlas2Based",
+            forceAtlas2Based: {
+              gravitationalConstant: -100,
+              centralGravity: 0.01,
+              springLength: 150,
+              springConstant: 0.08,
+            },
+            minVelocity: 0.75,
+            stabilization: { iterations: 150 },
+          },
+        };
+
+        let network = new vis.Network(container, networkData, options);
+
+        network.on("click", function (params) {
+          if (params.edges.length > 0) {
+            const edgeId = params.edges[0];
+            const edge = edges.get(edgeId);
+            if (edge) {
+              window.location.href = `/similarity_detail/${edge.from}/${edge.to}/`;
+            }
+          }
+        });
+
+        if (filteredNodes.length === 0) {
+          document.getElementById("network-graph").innerHTML =
+            "<p class='text-center text-danger'>Tidak ada keterkaitan dokumen yang memenuhi batas keterkaitan.</p>";
+        }
+      })
+      .catch((error) => console.error("Error loading graph data:", error));
+  }
+</script>
+{% endblock %}

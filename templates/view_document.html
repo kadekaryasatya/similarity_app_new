@@ -1,0 +1,29 @@
+{% extends 'base.html' %} {% block content %}
+<div id="content-detail">
+  <div id="content-detail-heading">
+    <div id="content-detail-subheading">Detail Dokumen</div>
+    <form
+      id="delete-form-{{ doc.id }}"
+      method="POST"
+      action="{% url 'delete_document' doc_id=doc.id %}"
+    >
+      {% csrf_token %}
+      <button class="content-saved-delete" type="submit" name="delete">
+        Hapus
+      </button>
+    </form>
+  </div>
+  <div id="content-detail-list">
+    <h2>{{ doc.title }}</h2>
+    <p><strong>Pemrakarsa:</strong> {{ doc.pemrakarsa }}</p>
+    <p><strong>Level Peraturan:</strong> {{ doc.level_peraturan }}</p>
+    <p><strong>Konten Penimbang:</strong> {{ doc.konten_penimbang }}</p>
+    <p><strong>Peraturan Terkait:</strong> {{ doc.peraturan_terkait }}</p>
+    <p><strong>Konten Peraturan:</strong> {{ doc.konten_peraturan }}</p>
+    <p><strong>Kategori Peraturan:</strong> {{ doc.kategori_peraturan }}</p>
+    <p><strong>Topik Peraturan:</strong> {{ doc.topik_peraturan }}</p>
+    <p><strong>Struktur Peraturan:</strong> {{ doc.struktur_peraturan }}</p>
+  </div>
+</div>
+
+{% endblock %}

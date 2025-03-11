@@ -1,0 +1,138 @@
+{% extends "base.html" %} {% block content %}
+<div id="content-similarity" style="color: #000">
+  <div id="content-similarity-subheading">Keterkaitan Dokumen</div>
+  <div
+    id="network-graph"
+    style="
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      color: #000;
+      height: 65vh;
+    "
+  ></div>
+  {% if clustering_ready %}
+  <a href="{% url 'clustering' %}" class="button_clustering"
+    >Lihat Clustering</a
+  >
+  {% endif %}
+</div>
+
+<div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("{% url 'similarity_graph' %}")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            document.getElementById(
+              "network-graph"
+            ).innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            return;
+          }
+
+          function truncateLabel(label, maxLength = 15) {
+            return label.length > maxLength
+              ? label.substring(0, maxLength) + "..."
+              : label;
+          }
+
+          function scaleWidth(similarity_score) {
+            const minWidth = 1;
+            const maxWidth = 15;
+            return minWidth + (maxWidth - minWidth) * (similarity_score / 100);
+          }
+
+          function getEdgeColor(similarity_score) {
+            if (similarity_score >= 80) return "#e74c3c";
+            if (similarity_score >= 50) return "#f39c12";
+            return "#3498db";
+          }
+
+          const nodeDegree = {};
+          data.edges.forEach((edge) => {
+            nodeDegree[edge.from] = (nodeDegree[edge.from] || 0) + 1;
+            nodeDegree[edge.to] = (nodeDegree[edge.to] || 0) + 1;
+          });
+
+          var nodes = new vis.DataSet(
+            data.nodes.map((node) => ({
+              id: node.id,
+              label: truncateLabel(node.label),
+              title: node.label,
+              shape: "dot",
+              size: 20 + (nodeDegree[node.id] || 0) * 3,
+              color: "#2ecc71",
+              font: { size: 14, color: "#000000", face: "Arial" },
+            }))
+          );
+
+          var edges = new vis.DataSet(
+            data.edges.map((edge) => {
+              const similarity_score = parseFloat(edge.label.replace("%", ""));
+              return {
+                from: edge.from,
+                to: edge.to,
+                width: scaleWidth(similarity_score),
+                label: edge.label,
+                font: {
+                  align: "middle",
+                  color: "#000000",
+                  size: 12,
+                  face: "Arial",
+                },
+                color: { color: getEdgeColor(similarity_score), opacity: 0.9 },
+              };
+            })
+          );
+
+          var container = document.getElementById("network-graph");
+          var networkData = { nodes: nodes, edges: edges };
+          var options = {
+            edges: {
+              smooth: true,
+              arrows: { to: { enabled: false } },
+            },
+            nodes: {
+              borderWidth: 2,
+              shadow: true,
+            },
+            interaction: {
+              hover: true,
+              navigationButtons: true,
+              zoomView: true,
+            },
+            physics: {
+              enabled: true,
+              solver: "forceAtlas2Based",
+              forceAtlas2Based: {
+                gravitationalConstant: -100,
+                centralGravity: 0.01,
+                springLength: 150,
+                springConstant: 0.08,
+              },
+              minVelocity: 0.75,
+              stabilization: { iterations: 150 },
+            },
+          };
+
+          var network = new vis.Network(container, networkData, options);
+
+          // Tambahkan event listener untuk klik pada edge (garis)
+          network.on("click", function (params) {
+            if (params.edges.length > 0) {
+              const edgeId = params.edges[0]; // Ambil ID edge yang diklik
+              const edge = edges.get(edgeId); // Ambil data edge berdasarkan ID
+              if (edge) {
+                window.location.href = `/similarity_detail/${edge.from}/${edge.to}/`;
+              }
+            }
+          });
+        })
+        .catch((error) => console.error("Error loading graph data:", error));
+    });
+  </script>
+</div>
+{% endblock %}

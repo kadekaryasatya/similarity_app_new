@@ -1,0 +1,73 @@
+{% extends 'base.html' %} {% block content %}
+
+<div id="content-add">
+  <!-- ✅ Pesan Notifikasi -->
+  {% if messages %}
+  <div id="message-container">
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Custom File Input -->
+    <div id="content-add-file-input">
+      <input
+        type="file"
+        name="file"
+        id="content-add-file"
+        required
+        onchange="updateButtonLabel()"
+      />
+      <label for="content-add-file" id="content-add-file-button">
+        <span id="file-button-label">+</span>
+        <span id="file-button-text" title="Pilih File">Pilih File</span>
+      </label>
+    </div>
+    <div id="content-add-title">Masukan file PDF, Word</div>
+
+    <button type="submit" id="content-add-upload-button">Upload</button>
+  </form>
+</div>
+
+<!-- ✅ Tambahkan CSS untuk pesan -->
+<style>
+  #message-container {
+    margin-bottom: 15px;
+  }
+  .message-box {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  .success {
+    background-color: #ccffcc;
+    color: #008000;
+  }
+  .error {
+    background-color: #ffcccc;
+    color: #cc0000;
+  }
+</style>
+
+<script>
+  function updateButtonLabel() {
+    const fileInput = document.getElementById("content-add-file");
+    const buttonText = document.getElementById("file-button-text");
+
+    if (fileInput.files.length > 0) {
+      let fileName = fileInput.files[0].name;
+      buttonText.textContent =
+        fileName.length > 20 ? fileName.slice(0, 17) + "..." : fileName; // Batasi panjang
+      buttonText.title = fileName; // Tambahkan title untuk tooltip
+    } else {
+      buttonText.textContent = "Pilih File";
+      buttonText.title = "Pilih File";
+    }
+  }
+</script>
+
+{% endblock %}

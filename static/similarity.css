@@ -1,0 +1,51 @@
+#content-similarity {
+  padding: 40px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#content-similarity-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fee6a5;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+#content-similarity-subheading {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: underline;
+  color: white;
+  margin-bottom: 20px;
+}
+
+#network-graph .vis-network {
+  width: 100%;
+  height: 100%;
+}
+
+#network-graph .vis-network canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.button_clustering {
+  margin-top: 20px;
+  padding: 10px 20px;
+  text-decoration: none;
+  font-weight: bold;
+  align-self: flex-end; /* Menempatkan tombol di kanan */
+  cursor: pointer;
+  border: 1px solid white;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #fee6a5;
+  font-weight: 600;
+  color: #000;
+}
+
+.button_clustering:hover {
+  opacity: 0.8;
+}

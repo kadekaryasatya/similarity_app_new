@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block content %}
+<div id="content-clustering">
+  <h2 id="content-clustering-subheading">Hasil Clustering</h2>
+
+  {% if clusters %}
+  <div id="content-clustering-list">
+    {{ clusters | safe }}
+    <p><strong>Silhouette Score:</strong> {{ silhouette_avg }}</p>
+    {% else %}
+    <p class="alert alert-warning">Belum ada hasil clustering.</p>
+    {% endif %}
+  </div>
+
+  <a href="{% url 'similarity' %}" class="button_similarity">Similarity</a>
+</div>
+{% endblock %}

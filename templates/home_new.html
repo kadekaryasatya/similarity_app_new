@@ -1,0 +1,76 @@
+<!-- similarity_docs_app/templates/home.html -->
+{% extends 'base.html' %} {% block content %}
+<div id="content-saved">
+  <div id="content-saved-heading">
+    Analisa Tingkat Keterkaitan Antara Naskah Peraturan
+  </div>
+
+  <div style="display: flex; justify-content: center; margin-bottom: 20px">
+    <form method="GET" action="{% url 'home' %}">
+      <input
+        type="text"
+        name="q"
+        id="searchInput"
+        placeholder="Cari Dokumen..."
+        value="{{ query }}"
+        style="
+          width: 400px;
+          padding: 10px;
+          border-radius: 8px;
+          border: none;
+          margin-right: 10px;
+        "
+      />
+      <button
+        type="submit"
+        style="
+          padding: 10px;
+          border-radius: 8px;
+          border: none;
+          margin-right: 10px;
+          cursor: pointer;
+        "
+      >
+        Cari
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function checkSearch() {
+      var input = document.getElementById("searchInput").value.trim();
+      if (input === "") {
+        window.location.href = "{% url 'home' %}";
+        return false;
+      }
+      return true;
+    }
+  </script>
+
+  {% if no_results %}
+  <div id="content-saved-list">
+    <p style="color: red; font-weight: bold; margin-top: 20px">
+      Dokumen tidak ditemukan.
+    </p>
+  </div>
+
+  {% endif %} {% if documents %}
+  <div id="content-saved-list">
+    {% for doc in documents %}
+    <div id="content-saved-item-{{ doc.id }}" class="content-saved-item">
+      <div class="content-saved-title">
+        <div>{{ forloop.counter }}.</div>
+        <div>{{ doc.title }}</div>
+      </div>
+      <div class="content-saved-actions">
+        <a href="{% url 'view_document' doc.id %}" class="content-saved-show"
+          >Lihat Isi</a
+        >
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

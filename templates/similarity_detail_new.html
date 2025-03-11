@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block content %}
+<div id="content-detail-similarity">
+  <h2 id="content-detail-similarity-subheading">Detail Keterkaitan Dokumen</h2>
+  <div id="content-detail-similarity-list">
+    <p><strong>Dokumen 1:</strong> {{ dokumen1 }}</p>
+    <p><strong>Dokumen 2:</strong> {{ dokumen2 }}</p>
+
+    <p>
+      <strong>Total Similarity:</strong> {{ total_similarity|floatformat:2 }}%
+    </p>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Komponen</th>
+          <th>Nilai Similarity (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item, value in detail_similarity.items %}
+        <tr>
+          <td>{{ item }}</td>
+          <td>{{ value|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{% url 'similarity' %}" class="button_similarity">Kembali</a>
+</div>
+{% endblock %}

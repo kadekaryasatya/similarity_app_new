@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Similarity Docs App</title>
+    <link rel="stylesheet" type="text/css" href="/static/global.css" />
+    <link rel="stylesheet" type="text/css" href="/static/home.css" />
+    <link rel="stylesheet" type="text/css" href="/static/add.css" />
+    <link rel="stylesheet" type="text/css" href="/static/similarity.css" />
+    <link rel="stylesheet" type="text/css" href="/static/detail.css" />
+    <link rel="stylesheet" type="text/css" href="/static/clustering.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/static/detail_similarity.css"
+    />
+  </head>
+  <body>
+    <main>
+      <div id="main_container">
+        <div id="sidebar">
+          <div id="sidebar-title">NAVIGASI</div>
+          <div id="sidebar-content">
+            <a
+              href="{% url 'home' %}"
+              class="{% if request.path == '/' %}active{% endif %}"
+            >
+              <div>Beranda</div>
+            </a>
+            <a
+              href="{% url 'add_document' %}"
+              class="{% if request.path == '/add/' %}active{% endif %}"
+            >
+              <div>Input Dokumen</div>
+            </a>
+            <a
+              href="{% url 'similarity' %}"
+              class="{% if request.path == '/similarity/' %}active{% endif %}"
+            >
+              <div>Similarity</div>
+            </a>
+          </div>
+        </div>
+        <div class="content">{% block content %}{% endblock %}</div>
+      </div>
+    </main>
+  </body>
+</html>

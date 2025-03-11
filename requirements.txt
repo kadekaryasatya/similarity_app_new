@@ -1,0 +1,9 @@
+Django==5.0.6
+fitz==0.0.1.dev2
+nltk==3.8.1
+pandas==2.0.1
+pdfkit==1.0.0
+Sastrawi==1.0.1
+Sastrawi==1.0.1
+scikit_learn==1.6.1
+sentence_transformers==3.0.1
