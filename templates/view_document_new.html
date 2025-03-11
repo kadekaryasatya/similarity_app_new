@@ -201,11 +201,14 @@
         let network = new vis.Network(container, networkData, options);
 
         network.on("click", function (params) {
-          if (params.edges.length > 0) {
+          if (params.nodes.length > 0) {
+            const nodeId = params.nodes[0]; // ID node yang diklik
+            window.location.href = `/document/${nodeId}/`; // Redirect ke halaman detail dokumen
+          } else if (params.edges.length > 0) {
             const edgeId = params.edges[0];
             const edge = edges.get(edgeId);
             if (edge) {
-              window.location.href = `/similarity_detail/${edge.from}/${edge.to}/`;
+              window.location.href = `/similarity_detail/${edge.from}/${edge.to}/`; // Redirect ke halaman keterkaitan
             }
           }
         });

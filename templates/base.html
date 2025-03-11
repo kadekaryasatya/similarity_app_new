@@ -23,12 +23,6 @@
           <div id="sidebar-title">NAVIGASI</div>
           <div id="sidebar-content">
             <a
-              href="{% url 'home' %}"
-              class="{% if request.path == '/' %}active{% endif %}"
-            >
-              <div>Beranda</div>
-            </a>
-            <a
               href="{% url 'add_document' %}"
               class="{% if request.path == '/add/' %}active{% endif %}"
             >
@@ -38,7 +32,13 @@
               href="{% url 'similarity' %}"
               class="{% if request.path == '/similarity/' %}active{% endif %}"
             >
-              <div>Similarity</div>
+              <div>Grafik</div>
+            </a>
+            <a
+              href="{% url 'home' %}"
+              class="{% if request.path == '/' %}active{% endif %}"
+            >
+              <div>List Dokumen</div>
             </a>
           </div>
         </div>
