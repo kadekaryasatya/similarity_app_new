@@ -100,7 +100,8 @@ def ekstrak_komponen(text, dokumen):
     pemrakarsa_match = re.search(pemrakarsa_pattern, text, re.IGNORECASE)
     pemrakarsa = pemrakarsa_match.group(0).strip() if pemrakarsa_match else "Pemrakarsa tidak ditemukan"
     
-    level_peraturan_pattern = r'\b(?:Undang-Undang Dasar 1945|Ketetapan Majelis Permusyawaratan Rakyat|Undang-Undang|Peraturan Pemerintah Pengganti Undang-Undang|Peraturan Pemerintah|Keputusan Presiden|Peraturan Menteri|Peraturan Gubernur|Peraturan Bupati)\b'
+    level_peraturan_pattern = r'\b(?:Undang-Undang Dasar 1945|Ketetapan Majelis Permusyawaratan Rakyat|Undang-Undang|Peraturan Pemerintah Pengganti Undang-Undang|Peraturan Pemerintah|Keputusan Presiden|Peraturan Menteri|Peraturan Gubernur|Peraturan Bupati|Majelis Permusyawaratan Rakyat|Dewan Perwakilan Rakyat|Dewan Perwakilan Daerah|Mahkamah Agung|Mahkamah Konstitusi|Badan Pemeriksa Keuangan|Komisi Yudisial|Bank Indonesia|Menteri)\b'
+
     level_peraturan_match = re.search(level_peraturan_pattern, text, re.IGNORECASE)
     if level_peraturan_match:
         level_peraturan = level_peraturan_match.group(0).strip()
@@ -108,8 +109,25 @@ def ekstrak_komponen(text, dokumen):
             level_peraturan = "peraturan daerah provinsi"
         elif level_peraturan.lower() == "peraturan bupati":
             level_peraturan = "peraturan daerah kabupaten/Kota"
+
+        level_list = [
+            "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945",
+            "Ketetapan Majelis Permusyawaratan Rakyat",
+            "Undang-Undang/Peraturan Pemerintah Pengganti Undang-Undang",
+            "Peraturan Pemerintah",
+            "Peraturan Presiden",
+            "Peraturan Daerah Provinsi",
+            "Peraturan Daerah Kabupaten/Kota"
+        ]
+
+        if level_peraturan in level_list:
+            kategori_peraturan = "Peraturan Perundang-undangan"
+        else:
+            kategori_peraturan = "Peraturan Perundang-undangan lainnya"
     else:
         level_peraturan = "Level Peraturan tidak ditemukan"
+        kategori_peraturan = "Kategori Peraturan tidak ditemukan"
+
 
     penimbang_pattern = r'Menimbang\s*(.*?)(?=Mengingat|$)'
     penimbang_match = re.search(penimbang_pattern, text, re.DOTALL| re.IGNORECASE)
@@ -123,22 +141,24 @@ def ekstrak_komponen(text, dokumen):
     konten_peraturan_match = re.search(konten_peraturan_pattern, text, re.IGNORECASE | re.DOTALL)
     konten_peraturan = (konten_peraturan_match.group(1)[:255]).strip() if konten_peraturan_match else "Konten peraturan tidak ditemukan"
 
-    if level_peraturan == "Level Peraturan tidak ditemukan":
-       kategori_peraturan = "peraturan biasa"
-    else:
-       kategori_peraturan = "peraturan perundang-undangan"
-    
-
     topik_kata_kunci = {
         "pendidikan": ["sekolah", "kurikulum", "pengajaran", "siswa", "guru", "pendidikan tinggi", "universitas", "beasiswa"],
         "kesehatan": ["rumah sakit", "dokter", "obat-obatan", "penyakit menular", "vaksinasi", "pelayanan kesehatan", "asuransi kesehatan"],
         "lingkungan hidup": ["polusi udara", "polusi air", "limbah", "konservasi", "hutan", "energi terbarukan", "pengelolaan sampah"],
         "pertanian": ["tanaman", "peternakan", "lahan pertanian", "irigasi", "pupuk", "pestisida", "perlindungan tanaman"],
-        "ketenagakerjaan": ["tenaga kerja", "upah", "keamanan kerja", "hak-hak pekerja", "serikat pekerja", "perlindungan sosial"],
+        "kelautan dan perikanan": ["perikanan", "kelautan", "kemaritiman"],
+        "ketenagakerjaan": ["tenaga kerja", "kepegawaian", "cipta kerja", "hukuman disiplin", "atribut", "upah", "aparatur sipil negara", "penerimaan calon praja", "IPDN", "pakaian dinas", "pegawai negeri sipil", "keamanan kerja", "hak-hak pekerja", "serikat pekerja", "gaji", "perlindungan sosial"],
         "perpajakan": ["pajak penghasilan", "pajak pertambahan nilai", "tarif pajak", "penghindaran pajak", "insentif pajak"],
         "investasi": ["pasar modal", "saham", "obligasi", "regulasi investasi", "perlindungan investor", "modal ventura"],
         "transportasi": ["angkutan","jalan", "transportasi umum", "kendaraan bermotor", "bandara", "pelabuhan", "transportasi massal"],
-        "keuangan": ["perbankan", "asuransi", "pasar keuangan", "regulasi keuangan", "inflasi", "suku bunga", "kebijakan moneter"]
+        "keuangan": ["perbankan", "keuangan", "pembayaran", "pembiayaan", "asuransi", "pasar keuangan", "regulasi keuangan", "inflasi", "suku bunga", "anggaran", "anggaran pendapatan", "belanja daerah", "belanja", "harga", "standar harga", "pengelolaan keuangan daerah", "standar harga satuan", "keuangan daerah", "satuan biaya", "harga pasar", "kebijakan moneter"],
+        "hak dan kewajiban": ["hak asasi manusia", "hak", "perlindungan perempuan", "pemberdayaan perempuan", "perlindungan anak", "gender", "kesetaraan gender", "pengarusutamaan gender", "responsif gender", "kesenjangan gender", "analisis gender", "perspektif gender", "korban kekerasan", "diskriminasi", "hak untuk hidup", "kebebasan berbicara", "hak beragama", "kepemilikan properti", "paten"],
+        "komunikasi": ["komunikasi", "siaran", "penyiaran", "radio", "iklan", "dokumenter", "film"],
+        "budaya dan pariwisata": ["desa wisata", "wisata", "pariwisata", "budaya", "kebudayaan"],
+        "riset dan teknologi": ["riset dan teknologi", "teknologi", "inovasi"],
+        "bencana alam": ["gempa bumi", "gelombang pasang", "gunung meletus", "tsunami", "erupsi", "banjir", "angin puting beliung", "tornado", "kekeringan", "tanah longsor"],
+        "ekonomi": ["ekonomi", "industri", "perdagangan", "perdagangan bebas", "produksi barang"],
+        "olahraga": ["pemuda dan olahraga", "kejuaraan olahraga", "olahragawan", "keolahragaan", "atlet", "pelatih olahraga", "olahraga"]
     }
 
     frekuensi_topik = {topik: 0 for topik in topik_kata_kunci}
